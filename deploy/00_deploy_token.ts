@@ -5,7 +5,7 @@ import { chainName, displayResult, dim, cyan, green, yellow } from "./utilities/
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { getNamedAccounts, deployments, getChainId, ethers } = hre;
   const { deploy } = deployments;
-  const { token_deployer, temp_admin } = await getNamedAccounts();
+  const { deployer, admin } = await getNamedAccounts();
   const chainId = parseInt(await getChainId());
 
   // 31337 is unit testing, 1337 is for coverage
@@ -16,21 +16,21 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   cyan("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
   dim(`network: ${chainName(chainId)} (${isTestEnvironment ? "local" : "remote"})`);
-  dim(`deployer: ${token_deployer}`);
+  dim(`deployer: ${deployer}`);
 
   cyan("\nDeploying Token Contract...");
 
   const tokenDeployResult = await deploy("Jigen", {
-    from: token_deployer,
-    args: [temp_admin],
+    from: deployer,
+    args: [admin],
     skipIfAlreadyDeployed: true,
   });
 
   displayResult("Jigen", tokenDeployResult);
 
   const tokenContract = await ethers.getContractAt("Jigen", tokenDeployResult.address);
-  dim(`Admin: ${temp_admin}`);
-  yellow("\nAdmin balance:\n" + (await tokenContract.balanceOf(temp_admin)).toString());
+  dim(`Admin: ${admin}`);
+  yellow("\nAdmin balance:\n" + (await tokenContract.balanceOf(admin)).toString());
 
   green(`\nDone!`);
 };

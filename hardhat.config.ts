@@ -41,11 +41,8 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0,
     },
-    temp_admin: {
+    admin: {
       default: 1,
-    },
-    token_deployer: {
-      default: 2,
     },
   },
   typechain: {
