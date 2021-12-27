@@ -5,10 +5,10 @@ pragma solidity 0.8.10;
 import { Ownable } from "./Ownable.sol";
 
 contract TransactionThrottler is Ownable {
-    bool private _initlialized;
-    bool private _restrictionActive;
-    uint256 private _tradingStart;
-    uint256 private _maxTransferAmount;
+    bool public _initialized;
+    bool public _restrictionActive;
+    uint256 public _tradingStart;
+    uint256 public _maxTransferAmount;
     uint256 private constant _delayBetweenTx = 30;
     mapping(address => bool) private _isWhitelisted;
     mapping(address => bool) private _isUnthrottled;
@@ -20,9 +20,9 @@ contract TransactionThrottler is Ownable {
     event MarkedWhitelisted(address indexed account, bool isWhitelisted);
     event MarkedUnthrottled(address indexed account, bool isUnthrottled);
 
-    function initAntibot() external onlyOwner() {
-        require(!_initlialized, "Protection: Already initialized");
-        _initlialized = true;
+    function initAntibot() external onlyOwner {
+        require(!_initialized, "Protection: Already initialized");
+        _initialized = true;
         _isUnthrottled[owner] = true;
         _tradingStart = 1640790000;
         _maxTransferAmount = 50_000 * 10**18;
@@ -34,23 +34,23 @@ contract TransactionThrottler is Ownable {
         emit RestrictionActiveChanged(_restrictionActive);
     }
 
-    function setTradingStart(uint256 _time) external onlyOwner() {
+    function setTradingStart(uint256 _time) external onlyOwner {
         require(_tradingStart > block.timestamp, "Protection: To late");
         _tradingStart = _time;
         emit TradingTimeChanged(_tradingStart);
     }
 
-    function setMaxTransferAmount(uint256 _amount) external onlyOwner() {
+    function setMaxTransferAmount(uint256 _amount) external onlyOwner {
         _maxTransferAmount = _amount;
         emit MaxTransferAmountChanged(_maxTransferAmount);
     }
 
-    function setRestrictionActive(bool _active) external onlyOwner() {
+    function setRestrictionActive(bool _active) external onlyOwner {
         _restrictionActive = _active;
         emit RestrictionActiveChanged(_restrictionActive);
     }
 
-    function unthrottleAccount(address _account, bool _unthrottled) external onlyOwner() {
+    function unthrottleAccount(address _account, bool _unthrottled) external onlyOwner {
         require(_account != address(0), "Zero address");
         _isUnthrottled[_account] = _unthrottled;
         emit MarkedUnthrottled(_account, _unthrottled);
@@ -60,7 +60,7 @@ contract TransactionThrottler is Ownable {
         return _isUnthrottled[account];
     }
 
-    function whitelistAccount(address _account, bool _whitelisted) external onlyOwner() {
+    function whitelistAccount(address _account, bool _whitelisted) external onlyOwner {
         require(_account != address(0), "Zero address");
         _isWhitelisted[_account] = _whitelisted;
         emit MarkedWhitelisted(_account, _whitelisted);
